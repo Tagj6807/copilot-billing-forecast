@@ -1,0 +1,179 @@
+"use client";
+
+import { useState } from "react";
+import posthog from "posthog-js";
+import { Flash, Header, Heading, IconButton, Label, Text } from "@primer/react";
+import { MarkGithubIcon, ShieldLockIcon, ThreeBarsIcon } from "@primer/octicons-react";
+import { Sidebar } from "@/components/sidebar";
+import { CsvUploader } from "@/components/csv-uploader";
+import { ReportProvider, useReport } from "@/components/report-provider";
+import { DEFAULT_TOOL_ID, getTool, getToolColor } from "@/lib/tools";
+import styles from "./app.module.css";
+
+function Shell() {
+  const [activeId, setActiveId] = useState(DEFAULT_TOOL_ID);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { report } = useReport();
+  const tool = getTool(activeId);
+  const ActiveView = tool?.component;
+  const toolColor = getToolColor(activeId);
+
+  const handleSelect = (id: string) => {
+    setActiveId(id);
+    setSidebarOpen(false);
+    // Privacy: only the stable tool id (a fixed enum) is captured - never any
+    // report contents or per-user data.
+    posthog.capture("tool_viewed", { tool_id: id });
+  };
+
+  return (
+    <div className={styles.appRoot}>
+      <Header className={styles.header}>
+        <Header.Item className={styles.menuToggle}>
+          <IconButton
+            icon={ThreeBarsIcon}
+            aria-label={sidebarOpen ? "Hide tools" : "Show tools"}
+            aria-expanded={sidebarOpen}
+            variant="invisible"
+            onClick={() => setSidebarOpen((o) => !o)}
+            style={{ color: "var(--fgColor-onEmphasis, #fff)" }}
+          />
+        </Header.Item>
+        <Header.Item>
+          <Header.Link
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              handleSelect(DEFAULT_TOOL_ID);
+            }}
+          >
+            <MarkGithubIcon size={28} />
+            <span className={styles.headerBrand} style={{ marginLeft: 8 }}>
+              Billing Forecast
+            </span>
+          </Header.Link>
+        </Header.Item>
+        <Header.Item full>
+          <Text style={{ color: "var(--fgColor-onEmphasis, #fff)", opacity: 0.7, fontSize: 14 }}>
+            Analyze &amp; forecast GitHub Copilot AI usage and spend
+          </Text>
+        </Header.Item>
+      </Header>
+
+      <div className={styles.appBody}>
+        <aside className={`${styles.pane} ${sidebarOpen ? styles.paneOpen : ""}`}>
+          <Sidebar activeId={activeId} onSelect={handleSelect} />
+        </aside>
+        {sidebarOpen && (
+          <div
+            className={styles.paneBackdrop}
+            onClick={() => setSidebarOpen(false)}
+            aria-hidden
+          />
+        )}
+
+        <main className={styles.main}>
+          <div
+            className={styles.contentBand}
+            style={{ ["--group-color" as string]: toolColor }}
+          >
+            <div className={styles.contentBandTitle}>
+              <div className={styles.contentBandHeading}>
+                <Heading as="h1" style={{ fontSize: 20 }}>
+                  {tool?.label ?? "Toolbox"}
+                </Heading>
+                {tool && (
+                  <Label
+                    size="small"
+                    style={{
+                      borderColor: toolColor,
+                      color: toolColor,
+                    }}
+                  >
+                    {tool.category}
+                  </Label>
+                )}
+              </div>
+              <Text className={styles.muted} style={{ fontSize: 14 }}>
+                {tool?.description}
+              </Text>
+            </div>
+            {report && <CsvUploader compact />}
+          </div>
+
+          <div className={styles.contentInner}>
+            {!report ? (
+              <GlobalUploadPrompt />
+            ) : ActiveView ? (
+              <ActiveView />
+            ) : (
+              <Text>Unknown tool.</Text>
+            )}
+            <footer className={styles.disclaimer}>
+              <Text as="p" className={styles.muted} style={{ fontSize: 12, lineHeight: 1.5 }}>
+                <strong>Disclaimer:</strong> This is not an official GitHub product. It is an
+                unofficial tool to help customers analyze and forecast their GitHub Copilot AI
+                usage and spend. All processing happens locally in your browser and your data
+                never leaves your device. Figures are estimates and may differ from your
+                official GitHub billing; always refer to your GitHub billing statements as the
+                source of truth. Provided &ldquo;as is&rdquo;, without warranty of any kind -
+                use at your own risk.
+              </Text>
+              <Text as="p" className={styles.muted} style={{ fontSize: 12, marginTop: 8 }}>
+                Open source on{" "}
+                <a
+                  href="https://github.com/BenDutton/copilot-billing-forecast"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  GitHub
+                </a>
+                {" "}- contributions welcome.
+              </Text>
+            </footer>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+function GlobalUploadPrompt() {
+  return (
+    <div className={styles.promptShell}>
+      <div className={styles.promptCard}>
+        <div className={styles.promptCopy}>
+          <Text className={styles.promptEyebrow}>Get started</Text>
+          <Heading as="h2" style={{ fontSize: 26, lineHeight: 1.15, margin: 0 }}>
+            Upload your GitHub AI usage report CSV.
+          </Heading>
+          <Text as="p" className={styles.muted} style={{ margin: 0, fontSize: 13, lineHeight: 1.5 }}>
+            To download or view an AI usage report in <strong>GitHub Enterprise</strong>, open your enterprise settings, choose <strong>Billing and licensing</strong>, select <strong>Usage</strong>, then <strong>AI usage</strong>, and press <strong>Get usage report</strong>.
+          </Text>
+          <Text as="p" className={styles.promptReference}>
+            Reference: <a href="https://docs.github.com/en/enterprise-cloud@latest/billing/reference/billing-reports" target="_blank" rel="noopener noreferrer">GitHub billing reports docs</a>
+          </Text>
+        </div>
+
+        <div className={styles.promptUpload}>
+          <Text className={styles.promptUploadLabel}>Upload CSV</Text>
+          <CsvUploader />
+          <Flash variant="default" className={styles.promptAlert}>
+            <ShieldLockIcon />
+            <Text as="p" className={styles.promptAlertText}>
+              Your CSV is processed locally and never leaves this browser.
+            </Text>
+          </Flash>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function AppShell() {
+  return (
+    <ReportProvider>
+      <Shell />
+    </ReportProvider>
+  );
+}

@@ -1,0 +1,17 @@
+date,product,sku,quantity,unit_type,applied_cost_per_quantity,gross_amount,discount_amount,net_amount,username,model
+2026-05-01,copilot,copilot_premium_request,120,request,0.04,4.80,1.00,3.80,alice,claude-sonnet-4
+2026-05-01,copilot,copilot_premium_request,80,request,0.04,3.20,0.50,2.70,bob,gpt-4o
+2026-05-02,copilot,copilot_premium_request,140,request,0.04,5.60,1.00,4.60,alice,claude-sonnet-4
+2026-05-02,copilot,copilot_premium_request,95,request,0.04,3.80,0.50,3.30,bob,gpt-4o
+2026-05-03,copilot,copilot_premium_request,160,request,0.04,6.40,1.00,5.40,alice,claude-sonnet-4
+2026-05-04,copilot,copilot_premium_request,150,request,0.04,6.00,0.80,5.20,carol,claude-sonnet-4
+2026-05-05,copilot,copilot_premium_request,180,request,0.04,7.20,1.00,6.20,alice,gpt-4o
+2026-05-06,copilot,copilot_premium_request,175,request,0.04,7.00,0.90,6.10,bob,claude-sonnet-4
+2026-05-07,copilot,copilot_premium_request,200,request,0.04,8.00,1.00,7.00,carol,gpt-4o
+2026-05-08,copilot,copilot_premium_request,210,request,0.04,8.40,1.10,7.30,alice,claude-sonnet-4
+2026-05-09,copilot,copilot_premium_request,195,request,0.04,7.80,1.00,6.80,bob,gpt-4o
+2026-05-10,copilot,copilot_premium_request,230,request,0.04,9.20,1.20,8.00,carol,claude-sonnet-4
+2026-05-11,copilot,copilot_premium_request,245,request,0.04,9.80,1.20,8.60,alice,gpt-4o
+2026-05-12,copilot,copilot_premium_request,260,request,0.04,10.40,1.30,9.10,bob,claude-sonnet-4
+2026-05-13,copilot,copilot_premium_request,250,request,0.04,10.00,1.20,8.80,carol,gpt-4o
+2026-05-14,copilot,copilot_premium_request,280,request,0.04,11.20,1.40,9.80,alice,claude-sonnet-4
