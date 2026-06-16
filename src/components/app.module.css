@@ -934,6 +934,23 @@
   margin-top: auto;
 }
 
+.buildInfo {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--fgColor-muted, #59636e);
+}
+
+.buildInfo a {
+  color: inherit;
+  font-family: var(--fontStack-monospace, ui-monospace, monospace);
+  text-decoration: none;
+}
+
+.buildInfo a:hover {
+  text-decoration: underline;
+}
+
 .resources {
   margin-top: 16px;
   padding-top: 16px;

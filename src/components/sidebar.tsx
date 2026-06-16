@@ -15,6 +15,9 @@ import {
 import { getToolsByCategory, CATEGORY_COLOR as TOOL_CATEGORY_COLOR, type ToolCategory } from "@/lib/tools";
 import styles from "./app.module.css";
 
+/** Short commit SHA of the deployed build, baked in at build time. */
+const COMMIT_SHA = process.env.NEXT_PUBLIC_COMMIT_SHA ?? "";
+
 /** Accent color per sidebar section, keyed by category (Resources is sidebar-only). */
 const CATEGORY_COLOR: Record<ToolCategory | "Resources", string> = {
   ...TOOL_CATEGORY_COLOR,
@@ -177,6 +180,20 @@ export function Sidebar({
             Your CSV is processed locally and never leaves this browser.
           </Text>
         </Flash>
+      </div>
+
+      <div className={styles.buildInfo}>
+        {COMMIT_SHA ? (
+          <a
+            href={`https://github.com/BenDutton/copilot-billing-forecast/commit/${COMMIT_SHA}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            build {COMMIT_SHA}
+          </a>
+        ) : (
+          <span>development</span>
+        )}
       </div>
     </nav>
   );

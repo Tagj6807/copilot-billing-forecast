@@ -5,6 +5,12 @@ import type { NextConfig } from "next";
 const isProd = process.env.NODE_ENV === "production";
 const repoBasePath = "/copilot-billing-forecast";
 
+// Short commit SHA of the deployed build. CI passes the full SHA via
+// NEXT_PUBLIC_COMMIT_SHA (from github.sha). Local/dev builds leave it empty so
+// the UI shows "development" rather than a misleading SHA that ignores
+// uncommitted changes.
+const commitSha = (process.env.NEXT_PUBLIC_COMMIT_SHA ?? "").slice(0, 7);
+
 const nextConfig: NextConfig = {
   // Emit a fully static site into ./out for GitHub Pages.
   output: "export",
@@ -14,6 +20,9 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
   basePath: isProd ? repoBasePath : undefined,
   assetPrefix: isProd ? `${repoBasePath}/` : undefined,
+  env: {
+    NEXT_PUBLIC_COMMIT_SHA: commitSha,
+  },
 };
 
 export default nextConfig;
