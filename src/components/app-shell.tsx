@@ -49,7 +49,7 @@ function Shell() {
           >
             <MarkGithubIcon size={28} />
             <span className={styles.headerBrand} style={{ marginLeft: 8 }}>
-              Billing Forecast
+              Copilot Billing Forecast
             </span>
           </Header.Link>
         </Header.Item>

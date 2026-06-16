@@ -4,7 +4,7 @@ import "./globals.css";
 import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
-  title: "Billing Forecast - Analyze & forecast GitHub Copilot AI usage and spend",
+  title: "Copilot Billing Forecast - Analyze & forecast GitHub Copilot AI usage and spend",
   description:
     "Client-side toolbox for analyzing and forecasting GitHub Copilot AI Credit usage and spend. Your data never leaves the browser.",
 };
