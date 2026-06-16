@@ -944,11 +944,13 @@
 .buildInfo a {
   color: inherit;
   font-family: var(--fontStack-monospace, ui-monospace, monospace);
-  text-decoration: none;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
-.buildInfo a:hover {
-  text-decoration: underline;
+.buildInfo a:hover,
+.buildInfo a:focus-visible {
+  text-decoration-thickness: 2px;
 }
 
 .resources {
