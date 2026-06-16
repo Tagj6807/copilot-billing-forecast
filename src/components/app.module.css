@@ -943,9 +943,16 @@
 
 .buildInfo a {
   color: inherit;
-  font-family: var(--fontStack-monospace, ui-monospace, monospace);
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+.buildInfo a[href*="/commit/"] {
+  font-family: var(--fontStack-monospace, ui-monospace, monospace);
+}
+
+.buildInfoSep {
+  margin: 0 6px;
 }
 
 .buildInfo a:hover,

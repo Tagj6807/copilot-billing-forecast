@@ -182,6 +182,16 @@ export function Sidebar({
       </div>
 
       <div className={styles.buildInfo}>
+        <a
+          href="https://github.com/BenDutton/copilot-billing-forecast"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Open source on GitHub
+        </a>
+        <span className={styles.buildInfoSep} aria-hidden="true">
+          ·
+        </span>
         {COMMIT_SHA ? (
           <a
             href={`https://github.com/BenDutton/copilot-billing-forecast/commit/${COMMIT_SHA}`}
