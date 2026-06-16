@@ -43,6 +43,34 @@ tools below without your data ever leaving your device.
 - **Spike Detection** - Flag days with anomalous usage above the trend.
 - **Cost Center Rollup** - Roll up AI Credit usage and budgets by cost center.
 
+## How the forecast range is calculated
+
+The Usage Forecast fits an **ordinary least squares linear regression** to your daily
+AI Credit usage and projects that trend forward over the horizon. The shaded band
+around the projection is an approximate **95% prediction interval**, calculated as
+follows:
+
+- The fitted line gives the central `forecast` value for each day.
+- The band half-width at a given day is `t · SE · √(1 + 1/n + (x − x̄)² / Sₓₓ)`, where
+  `SE` is the residual standard error of the fit, `n` is the number of days used, and
+  the square-root term is the standard prediction-interval leverage factor (the band
+  widens the further you project from the observed data).
+- `t` is an approximate 95% critical value that widens for small samples (≈4.3 for
+  ≤2 days down to 1.96 for >30 days) to account for added uncertainty.
+- Both bounds are floored at zero since daily usage can't be negative, and the
+  cumulative projected total is reported as a range (`projectedLower` to
+  `projectedUpper`) by summing each day's bounds.
+
+A couple of adjustments keep the run rate realistic:
+
+- The **most recent day is excluded from the regression** when at least three earlier
+  days remain, because the report is typically pulled mid-day and its partial total
+  would otherwise drag the trend down. It is still plotted as an actual.
+- The **trend indicator** (rising / falling / flat) compares the slope's effect over
+  the horizon against the noise level, so small fluctuations read as flat.
+
+The implementation lives in [src/lib/forecast.ts](src/lib/forecast.ts).
+
 ## Usage reports
 
 The app accepts GitHub usage report CSVs (summarized, detailed, and AI usage reports).

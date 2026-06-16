@@ -346,9 +346,12 @@ export function UsageForecast() {
       <div className={`${styles.card} ${styles.chartCard}`}>
         <div className={styles.cardHeaderRow}>
           <div>
-            <Heading as="h2" style={{ fontSize: 16 }}>
-              Cumulative AI Credits this month
-            </Heading>
+            <span className={styles.labelWithInfo}>
+              <Heading as="h2" style={{ fontSize: 16 }}>
+                Cumulative AI Credits this month
+              </Heading>
+              <InfoTip text="The projection fits a linear regression to your daily usage and extends it to month-end. The shaded band is an approximate 95% prediction interval: it widens with day-to-day variability and the further it projects, and is floored at zero. The most recent (partial) day is excluded from the fit so it doesn't drag the trend down." />
+            </span>
             <Text className={styles.muted} style={{ fontSize: 14 }}>
               Solid line is observed usage; the dashed purple line is the projected trend
               with an approximate 95% confidence band
