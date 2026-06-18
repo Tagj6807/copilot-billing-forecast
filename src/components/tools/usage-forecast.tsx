@@ -6,6 +6,7 @@ import {
   CartesianGrid,
   ComposedChart,
   Line,
+  ReferenceArea,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -30,6 +31,9 @@ import styles from "../app.module.css";
 /** 1 AI Credit (AIC) = $0.01 USD. */
 const USD_PER_AIC = 0.01;
 
+/** Accent colour for the drag-to-select range (matches the "Observed" series). */
+const SELECTION_COLOR = "#0969da";
+
 /**
  * Days from the last observed day through the end of that calendar month.
  * GitHub AI Credit entitlements reset monthly, so the forecast runs to month-end.
@@ -47,6 +51,18 @@ const TREND_META = {
   flat: { label: "Flat", variant: "secondary", Icon: DashIcon },
 } as const;
 
+/** A drag-selected span on the cumulative chart. */
+interface RangeSelection {
+  /** ISO date at the start (earlier edge) of the span. */
+  startDate: string;
+  /** Cumulative AIC at the start of the span. */
+  startValue: number;
+  /** Net AIC consumed across the span (endValue - startValue). */
+  delta: number;
+  /** Whole days covered by the span. */
+  days: number;
+}
+
 export function UsageForecast() {
   const { report } = useReport();
   const [entitlementInput, setEntitlementInput] = usePersistentState(
@@ -54,6 +70,12 @@ export function UsageForecast() {
   );
   const [adjustPct, setAdjustPct] = useState(0);
   const chartRef = useRef<HTMLDivElement>(null);
+
+  // Drag-to-select range on the chart. `selStart`/`selEnd` hold the date labels
+  // at the edges of the dragged span; `selecting` is true mid-drag.
+  const [selecting, setSelecting] = useState(false);
+  const [selStart, setSelStart] = useState<string | null>(null);
+  const [selEnd, setSelEnd] = useState<string | null>(null);
 
   const entitlement = Math.max(0, Number(entitlementInput) || 0);
   // What-if multiplier applied to the projected (future) daily run rate.
@@ -114,6 +136,51 @@ export function UsageForecast() {
       };
     });
   }, [forecast, multiplier]);
+
+  // Summary of the dragged range: the cumulative AIC consumed between the two
+  // selected dates (the `forecast` series carries the running total for both
+  // observed and projected days), with the span length in days.
+  const selection = useMemo<RangeSelection | null>(() => {
+    if (!selStart || !selEnd || !cumulativeData.length) return null;
+    const iA = cumulativeData.findIndex((d) => d.date === selStart);
+    const iB = cumulativeData.findIndex((d) => d.date === selEnd);
+    if (iA === -1 || iB === -1 || iA === iB) return null;
+    const [lo, hi] = iA <= iB ? [iA, iB] : [iB, iA];
+    const startVal = cumulativeData[lo].forecast ?? 0;
+    const endVal = cumulativeData[hi].forecast ?? 0;
+    return {
+      startDate: cumulativeData[lo].date,
+      startValue: startVal,
+      delta: endVal - startVal,
+      days: hi - lo,
+    };
+  }, [selStart, selEnd, cumulativeData]);
+
+  type ChartMouseState = { activeLabel?: string | number } | null | undefined;
+
+  function beginSelect(e: ChartMouseState) {
+    const label = e?.activeLabel;
+    if (label == null) return;
+    setSelecting(true);
+    setSelStart(String(label));
+    setSelEnd(String(label));
+  }
+
+  function extendSelect(e: ChartMouseState) {
+    if (!selecting) return;
+    const label = e?.activeLabel;
+    if (label == null) return;
+    setSelEnd(String(label));
+  }
+
+  function endSelect() {
+    setSelecting(false);
+    // A click without a drag (start === end) clears any prior selection.
+    if (selStart && selEnd && selStart === selEnd) {
+      setSelStart(null);
+      setSelEnd(null);
+    }
+  }
 
   // First day (observed or projected) on which the cumulative total reaches the
   // entitlement, with the gap measured from today. The React Compiler memoizes
@@ -375,7 +442,14 @@ export function UsageForecast() {
 
         <div className={styles.chartWrap} ref={chartRef}>
           <ResponsiveContainer initialDimension={{ width: 600, height: 300 }}>
-            <ComposedChart data={cumulativeData} margin={{ top: 8, right: 16, bottom: 8, left: 8 }}>
+            <ComposedChart
+              data={cumulativeData}
+              margin={{ top: 8, right: 16, bottom: 8, left: 8 }}
+              onMouseDown={beginSelect}
+              onMouseMove={extendSelect}
+              onMouseUp={endSelect}
+              style={{ cursor: "crosshair", userSelect: "none" }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="var(--borderColor-muted, #d8dee4)" />
               <XAxis
                 dataKey="date"
@@ -388,7 +462,28 @@ export function UsageForecast() {
                 width={64}
                 tickFormatter={(v: number) => compactAic(v)}
               />
-              <Tooltip content={<CapTooltip entitlement={entitlement} />} />
+              <Tooltip content={<CapTooltip entitlement={entitlement} selection={selection} />} />
+              {selStart && selEnd && (
+                <ReferenceArea
+                  x1={selStart}
+                  x2={selEnd}
+                  fill={SELECTION_COLOR}
+                  fillOpacity={0.1}
+                  stroke={SELECTION_COLOR}
+                  strokeOpacity={0.4}
+                  label={
+                    selection
+                      ? {
+                          value: formatRangeLabel(selection),
+                          position: "insideTop",
+                          fontSize: 11,
+                          fontWeight: 600,
+                          fill: SELECTION_COLOR,
+                        }
+                      : undefined
+                  }
+                />
+              )}
               <Area
                 dataKey="band"
                 stroke="none"
@@ -455,6 +550,12 @@ export function UsageForecast() {
           </ResponsiveContainer>
         </div>
 
+        <Text className={styles.muted} style={{ fontSize: 12, marginTop: 8 }}>
+          {selection
+            ? "Tip: click the chart to clear the selection."
+            : "Tip: drag across the chart to measure the AI Credits used between two dates."}
+        </Text>
+
         <div className={styles.chartLegend}>
           <span className={styles.legendItem}>
             <span className={styles.legendSwatch} style={{ backgroundColor: "#0969da" }} />
@@ -486,11 +587,13 @@ function CapTooltip({
   payload,
   label,
   entitlement,
+  selection,
 }: {
   active?: boolean;
   payload?: TooltipEntry[];
   label?: string | number;
   entitlement: number;
+  selection?: RangeSelection | null;
 }) {
   if (!active || !payload?.length) return null;
 
@@ -505,6 +608,13 @@ function CapTooltip({
   const showBaseline =
     isProjected && baseline != null && Math.abs((forecast ?? 0) - baseline) > 0.5;
   const overageAic = entitlement > 0 ? Math.max(0, value - entitlement) : 0;
+
+  // Running diff from the start of the selected range to the hovered point.
+  // Only shown while hovering a point other than the range's own start.
+  const hoveredDate = label != null ? String(label) : null;
+  const inSelection = selection != null && hoveredDate != null && hoveredDate !== selection.startDate;
+  const selDiff = inSelection ? value - selection.startValue : null;
+  const selDays = inSelection ? Math.abs(daysBetween(selection.startDate, hoveredDate)) : null;
 
   return (
     <div
@@ -527,6 +637,27 @@ function CapTooltip({
       {isProjected && band && (
         <div className={styles.muted}>
           Range: {formatAic(band[0])} – {formatAic(band[1])}
+        </div>
+      )}
+      {selDiff != null && (
+        <div
+          style={{
+            marginTop: 6,
+            paddingTop: 6,
+            borderTop: "1px solid var(--borderColor-muted, #d8dee4)",
+          }}
+        >
+          <div className={styles.muted}>
+            Selected from {selection!.startDate.slice(5)}
+            {selDays != null ? ` · ${plural(selDays, "day")}` : ""}
+          </div>
+          <div style={{ color: SELECTION_COLOR, fontWeight: 600 }}>
+            {selDiff >= 0 ? "+" : "−"}
+            {formatAic(Math.abs(selDiff))}
+          </div>
+          <div style={{ color: SELECTION_COLOR }}>
+            {formatUsd(Math.abs(selDiff) * USD_PER_AIC)}
+          </div>
         </div>
       )}
       {overageAic > 0 && (
@@ -607,6 +738,24 @@ function daysFromToday(isoDate: string): number {
   const now = new Date();
   const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
   return Math.round((target - today) / 86_400_000);
+}
+
+/** Whole days between two ISO dates (b - a). */
+function daysBetween(a: string, b: string): number {
+  const [ya, ma, da] = a.split("-").map(Number);
+  const [yb, mb, db] = b.split("-").map(Number);
+  if (!ya || !ma || !da || !yb || !mb || !db) return 0;
+  return Math.round((Date.UTC(yb, mb - 1, db) - Date.UTC(ya, ma - 1, da)) / 86_400_000);
+}
+
+/** "1 day" / "3 days". */
+function plural(n: number, unit: string): string {
+  return `${n} ${unit}${n === 1 ? "" : "s"}`;
+}
+
+/** Compact label drawn across a selected range on the chart. */
+function formatRangeLabel(sel: RangeSelection): string {
+  return `${formatAic(sel.delta)} · ${formatUsd(sel.delta * USD_PER_AIC)} · ${plural(sel.days, "day")}`;
 }
 
 function formatAic(value: number): string {
