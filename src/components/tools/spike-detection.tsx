@@ -323,7 +323,10 @@ export function SpikeDetection() {
                           </span>
                         </td>
                         <td>
-                          <span className={styles.userName}>{s.date}</span>
+                          <span className={styles.userName}>{s.date}</span>{" "}
+                          <Text className={styles.muted} style={{ fontSize: 12 }}>
+                            {dayOfWeek(s.date)}
+                          </Text>
                         </td>
                         <td className={styles.numCol}>
                           {formatAic(s.value)}
@@ -333,6 +336,9 @@ export function SpikeDetection() {
                         <td className={styles.numCol}>
                           <span style={{ color: "var(--fgColor-danger, #cf222e)", fontWeight: 600 }}>
                             +{formatAic(s.value - s.expected)}
+                          </span>
+                          <span className={styles.costInline}>
+                            +{formatUsd((s.value - s.expected) * USD_PER_AIC)}
                           </span>
                           <div className={styles.statSub}>{formatMultiple(s.ratio)} expected</div>
                         </td>
@@ -401,6 +407,8 @@ function SpikeDetail({
 }) {
   const above = spike.value - spike.expected;
   const vsBaseline = baseline > 0 ? (spike.value / baseline) * 100 : 0;
+  const userTotal = users.reduce((a, u) => a + u.qty, 0);
+  const topUserShare = userTotal > 0 && users[0] ? (users[0].qty / userTotal) * 100 : 0;
   return (
     <div className={styles.detailPanel}>
       <div className={styles.detailGrid}>
@@ -423,6 +431,15 @@ function SpikeDetail({
             <dd>{spike.z.toFixed(1)}σ</dd>
             <dt>vs. baseline</dt>
             <dd>{vsBaseline.toFixed(0)}% of average day</dd>
+            {users.length > 0 && (
+              <>
+                <dt>Concentration</dt>
+                <dd>
+                  Top user drove {topUserShare.toFixed(0)}% across {users.length}{" "}
+                  {users.length === 1 ? "user" : "users"}
+                </dd>
+              </>
+            )}
           </dl>
         </div>
 
@@ -589,6 +606,14 @@ function formatUsd(value: number): string {
 function formatMultiple(ratio: number): string {
   if (!Number.isFinite(ratio)) return "∞×";
   return `${ratio.toFixed(1)}×`;
+}
+
+/** Short weekday name for a YYYY-MM-DD date, parsed as local time. */
+function dayOfWeek(date: string): string {
+  const d = new Date(`${date}T00:00:00`);
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleDateString(undefined, { weekday: "short" });
 }
 
 function compactAic(value: number): string {
