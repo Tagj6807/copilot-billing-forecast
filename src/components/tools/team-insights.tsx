@@ -5,7 +5,6 @@ import {
   Heading,
   Text,
   Label,
-  FormControl,
   TextInput,
   IconButton,
   Tooltip as PrimerTooltip,
@@ -222,26 +221,42 @@ export function TeamInsights() {
       {/* Controls */}
       <div className={styles.controlsRow}>
         <Label variant="accent">{totalUsers} users · projection through {monthEndLabel}</Label>
-        <FormControl>
-          <FormControl.Label>
-            <span className={styles.labelWithInfo}>
-              Universal user budget
-              <InfoTip text="Optional AI Credit budget applied to every user. Anyone whose projected month total exceeds it is flagged as over budget. 1 AIC = $0.01 USD." />
-            </span>
-          </FormControl.Label>
-          <TextInput
-            type="number"
-            min={0}
-            placeholder="e.g. 5000"
-            value={budgetInput}
-            onChange={(e) => {
-              setBudgetInput(e.target.value);
-              setPage(0);
-            }}
-            trailingVisual="AIC"
-            style={{ width: 200 }}
-          />
-        </FormControl>
+        <div className={styles.sliderField}>
+          <span className={styles.labelWithInfo} style={{ fontSize: 12, fontWeight: 600 }}>
+            Universal user budget
+            <InfoTip text="Optional AI Credit budget applied to every user. Anyone whose projected month total exceeds it is flagged as over budget. 1 AIC = $0.01 USD." />
+          </span>
+          <div className={styles.fieldRow}>
+            <TextInput
+              type="number"
+              min={0}
+              placeholder="e.g. 5000"
+              value={budgetInput}
+              onChange={(e) => {
+                setBudgetInput(e.target.value);
+                setPage(0);
+              }}
+              trailingVisual="AIC"
+              style={{ width: 240 }}
+            />
+            <Button
+              variant="invisible"
+              size="small"
+              onClick={() => {
+                setBudgetInput("");
+                setPage(0);
+              }}
+              disabled={!budgetInput}
+            >
+              Reset
+            </Button>
+          </div>
+          <span className={styles.fieldHint}>
+            {budget > 0
+              ? `Flagging users projected above ${formatAic(budget)} AIC.`
+              : "Add a budget to flag users projected to exceed it."}
+          </span>
+        </div>
       </div>
 
       {/* Summary stats */}

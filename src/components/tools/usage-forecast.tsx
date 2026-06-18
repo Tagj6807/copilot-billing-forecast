@@ -13,13 +13,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Heading, Text, Label, FormControl, TextInput, Tooltip as PrimerTooltip, IconButton } from "@primer/react";
+import { Heading, Text, Label, TextInput, Tooltip as PrimerTooltip, IconButton, Button } from "@primer/react";
 import {
   ArrowUpRightIcon,
   ArrowDownRightIcon,
   DashIcon,
   InfoIcon,
-  XCircleFillIcon,
 } from "@primer/octicons-react";
 import { useReport } from "@/components/report-provider";
 import { ExportMenu } from "@/components/export-menu";
@@ -266,53 +265,71 @@ export function UsageForecast() {
               Run-rate change
               <InfoTip text="What-if: adjust the projected daily usage from today onward. Drag left to model cutting usage, right to model growth. Observed days are unchanged." />
             </span>
-            <div className={styles.sliderRow}>
-              <input
-                type="range"
-                min={-100}
-                max={100}
-                step={5}
-                value={adjustPct}
-                onChange={(e) => setAdjustPct(Number(e.target.value))}
-                aria-label="Run-rate change percentage"
-                style={{ width: 200 }}
-              />
-              <span className={styles.sliderValue}>
-                <Label variant={adjustPct === 0 ? "secondary" : adjustPct < 0 ? "success" : "danger"}>
-                  {adjustPct > 0 ? "+" : ""}
-                  {adjustPct}%
-                </Label>
-              </span>
-              <PrimerTooltip text="Reset run-rate change to 0%" direction="n">
-                <IconButton
-                  icon={XCircleFillIcon}
-                  aria-label="Reset run-rate change to 0%"
-                  variant="invisible"
-                  size="small"
-                  unsafeDisableTooltip
-                  onClick={() => setAdjustPct(0)}
-                  style={{ visibility: adjustPct === 0 ? "hidden" : "visible" }}
+            <div className={styles.fieldRow}>
+              <div className={styles.sliderControl}>
+                <input
+                  type="range"
+                  min={-100}
+                  max={100}
+                  step={5}
+                  value={adjustPct}
+                  onChange={(e) => setAdjustPct(Number(e.target.value))}
+                  aria-label="Run-rate change percentage"
                 />
-              </PrimerTooltip>
+                <span className={styles.sliderValue}>
+                  <Label variant={adjustPct === 0 ? "secondary" : adjustPct < 0 ? "success" : "danger"}>
+                    {adjustPct > 0 ? "+" : ""}
+                    {adjustPct}%
+                  </Label>
+                </span>
+              </div>
+              <Button
+                variant="invisible"
+                size="small"
+                onClick={() => setAdjustPct(0)}
+                disabled={adjustPct === 0}
+              >
+                Reset
+              </Button>
             </div>
+            <span className={styles.fieldHint}>
+              {adjustPct === 0
+                ? "Projecting at the observed trend."
+                : adjustPct < 0
+                  ? `Modelling ${Math.abs(adjustPct)}% lower future usage.`
+                  : `Modelling ${adjustPct}% higher future usage.`}
+            </span>
           </div>
-          <FormControl>
-            <FormControl.Label>
-              <span className={styles.labelWithInfo}>
-                AI Credit entitlement
-                <InfoTip text="Your monthly AI Credit allowance. Shown as a dotted cap line on the chart. 1 AIC = $0.01 USD, so any projected overage is also priced in USD." />
-              </span>
-            </FormControl.Label>
-            <TextInput
-              type="number"
-              min={0}
-              placeholder="e.g. 3900"
-              value={entitlementInput}
-              onChange={(e) => setEntitlementInput(e.target.value)}
-              trailingVisual="AIC"
-              style={{ width: 200 }}
-            />
-          </FormControl>
+          <div className={styles.sliderField}>
+            <span className={styles.labelWithInfo} style={{ fontSize: 12, fontWeight: 600 }}>
+              AI Credit entitlement
+              <InfoTip text="Your monthly AI Credit allowance. Shown as a dotted cap line on the chart. 1 AIC = $0.01 USD, so any projected overage is also priced in USD." />
+            </span>
+            <div className={styles.fieldRow}>
+              <TextInput
+                type="number"
+                min={0}
+                placeholder="e.g. 3900"
+                value={entitlementInput}
+                onChange={(e) => setEntitlementInput(e.target.value)}
+                trailingVisual="AIC"
+                style={{ width: 240 }}
+              />
+              <Button
+                variant="invisible"
+                size="small"
+                onClick={() => setEntitlementInput("")}
+                disabled={!entitlementInput}
+              >
+                Reset
+              </Button>
+            </div>
+            <span className={styles.fieldHint}>
+              {entitlement > 0
+                ? `Cap line shown on the chart at ${formatAic(entitlement)} AIC.`
+                : "Add your allowance to see the cap line and any overage."}
+            </span>
+          </div>
         </div>
       </div>
 

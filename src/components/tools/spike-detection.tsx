@@ -18,6 +18,7 @@ import {
   Label,
   SegmentedControl,
   IconButton,
+  Button,
   Tooltip as PrimerTooltip,
 } from "@primer/react";
 import {
@@ -113,22 +114,35 @@ export function SpikeDetection() {
         <Label variant="accent">
           {analysis.points.length} days · baseline {formatAic(analysis.baselineRunRate)}/day
         </Label>
-        <div className={styles.controlsGroup}>
+        <div className={styles.sliderField}>
           <span className={styles.labelWithInfo} style={{ fontSize: 12, fontWeight: 600 }}>
             Sensitivity
             <InfoTip text="How far above the trend a day must sit to count as a spike. High flags smaller deviations (≥1.5σ); Low only flags extreme ones (≥3σ)." />
           </span>
-          <SegmentedControl aria-label="Spike sensitivity" size="small">
-            {SENS_ORDER.map((key) => (
-              <SegmentedControl.Button
-                key={key}
-                selected={sensitivity === key}
-                onClick={() => setSensitivity(key)}
-              >
-                {SENSITIVITY[key].label}
-              </SegmentedControl.Button>
-            ))}
-          </SegmentedControl>
+          <div className={styles.fieldRow}>
+            <SegmentedControl aria-label="Spike sensitivity" size="small">
+              {SENS_ORDER.map((key) => (
+                <SegmentedControl.Button
+                  key={key}
+                  selected={sensitivity === key}
+                  onClick={() => setSensitivity(key)}
+                >
+                  {SENSITIVITY[key].label}
+                </SegmentedControl.Button>
+              ))}
+            </SegmentedControl>
+            <Button
+              variant="invisible"
+              size="small"
+              onClick={() => setSensitivity("medium")}
+              disabled={sensitivity === "medium"}
+            >
+              Reset
+            </Button>
+          </div>
+          <span className={styles.fieldHint}>
+            Flagging days that sit ≥{z}σ above the trend.
+          </span>
         </div>
       </div>
 

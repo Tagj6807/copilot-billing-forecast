@@ -243,24 +243,68 @@
 
 .sliderValue {
   display: inline-flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
-  width: 52px;
+  min-width: 44px;
   flex-shrink: 0;
 }
 
-/* Run-rate control: label stacked above a centred slider row, so it lines up
-   with the neighbouring entitlement field. */
+/* What-if controls: a label stacked above a row that pairs an input-styled
+   control with a Reset button. Both controls share the same dimensions so the
+   run-rate and entitlement fields line up cleanly. Each sits in its own card
+   so the boundary between the two controls is unmistakable. */
 .sliderField {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--borderColor-default, #d1d9e0);
+  border-radius: 8px;
+  background: var(--bgColor-muted, #f6f8fa);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
-.sliderRow {
+/* Lift the active control: accent the border and add a soft focus ring so the
+   field the user is interacting with is clearly the one in focus. */
+.sliderField:focus-within {
+  border-color: var(--fgColor-accent, #0969da);
+  background: var(--bgColor-default, #ffffff);
+  box-shadow: 0 0 0 3px var(--borderColor-accent-muted, rgba(9, 105, 218, 0.15));
+}
+
+/* Small caption beneath each field describing the current effect, so the
+   controls explain themselves rather than reading as bare inputs. */
+.fieldHint {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--fgColor-muted, #59636e);
+}
+
+.fieldRow {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* Mirrors the Primer TextInput so the slider reads as a first-class field. */
+.sliderControl {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 240px;
+  height: 32px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border: 1px solid var(--borderColor-default, #d1d9e0);
+  border-radius: 6px;
+  background: var(--bgColor-default, #ffffff);
+}
+
+.sliderControl input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  accent-color: var(--fgColor-accent, #0969da);
 }
 
 .statGrid {
