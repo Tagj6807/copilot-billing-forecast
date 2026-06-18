@@ -21,6 +21,7 @@ import {
   InfoIcon,
 } from "@primer/octicons-react";
 import { useReport } from "@/components/report-provider";
+import { usePrefersReducedMotion } from "@/components/use-prefers-reduced-motion";
 import { ExportMenu } from "@/components/export-menu";
 import { usePersistentState } from "@/components/use-persistent-state";
 import { aggregateDaily, sumMetric } from "@/lib/report";
@@ -64,6 +65,7 @@ interface RangeSelection {
 
 export function UsageForecast() {
   const { report } = useReport();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [entitlementInput, setEntitlementInput] = usePersistentState(
     "usage-forecast:entitlement",
   );
@@ -253,6 +255,12 @@ export function UsageForecast() {
         ]
       : [{ label: "Trend", value: trend.label, sub: `R² ${forecast.rSquared.toFixed(2)}` }]),
   ];
+
+  const chartAnim = {
+    isAnimationActive: !prefersReducedMotion,
+    animationDuration: 600,
+    animationEasing: "ease-out" as const,
+  };
 
   return (
     <div className={styles.stack}>
@@ -506,7 +514,7 @@ export function UsageForecast() {
                 stroke="none"
                 fill="#8250df"
                 fillOpacity={0.15}
-                isAnimationActive={false}
+                {...chartAnim}
                 name="band"
               />
               {adjustPct !== 0 && (
@@ -517,7 +525,7 @@ export function UsageForecast() {
                   strokeWidth={1.5}
                   strokeDasharray="5 4"
                   dot={false}
-                  isAnimationActive={false}
+                  {...chartAnim}
                   name="baseline"
                 />
               )}
@@ -528,7 +536,7 @@ export function UsageForecast() {
                 strokeWidth={2}
                 strokeDasharray="5 4"
                 dot={false}
-                isAnimationActive={false}
+                {...chartAnim}
                 name="forecast"
               />
               <Line
@@ -538,7 +546,7 @@ export function UsageForecast() {
                 strokeWidth={2.5}
                 dot={false}
                 connectNulls={false}
-                isAnimationActive={false}
+                {...chartAnim}
                 name="actual"
               />
               {lastActualDate && (

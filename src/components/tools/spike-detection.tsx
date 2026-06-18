@@ -28,6 +28,7 @@ import {
   AlertIcon,
 } from "@primer/octicons-react";
 import { useReport } from "@/components/report-provider";
+import { usePrefersReducedMotion } from "@/components/use-prefers-reduced-motion";
 import { ExportMenu } from "@/components/export-menu";
 import { aggregateDaily, dayContributions } from "@/lib/report";
 import { detectSpikes } from "@/lib/forecast";
@@ -45,6 +46,7 @@ const SENS_ORDER = ["high", "medium", "low"] as const;
 
 export function SpikeDetection() {
   const { report } = useReport();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [sensitivity, setSensitivity] = useState<string>("medium");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const chartRef = useRef<HTMLDivElement>(null);
@@ -106,6 +108,12 @@ export function SpikeDetection() {
   };
   const topContributor = (date: string, kind: "byUser" | "byModel") =>
     sortedContributors(date, kind)[0] ?? null;
+
+  const chartAnim = {
+    isAnimationActive: !prefersReducedMotion,
+    animationDuration: 600,
+    animationEasing: "ease-out" as const,
+  };
 
   return (
     <div className={styles.stack}>
@@ -251,7 +259,7 @@ export function SpikeDetection() {
                 stroke="none"
                 fill="#0969da"
                 fillOpacity={0.1}
-                isAnimationActive={false}
+                {...chartAnim}
                 name="expected range"
               />
               <Line
@@ -261,7 +269,7 @@ export function SpikeDetection() {
                 strokeWidth={1.5}
                 strokeDasharray="5 4"
                 dot={false}
-                isAnimationActive={false}
+                {...chartAnim}
                 name="expected"
               />
               <Line
@@ -270,10 +278,10 @@ export function SpikeDetection() {
                 stroke="#0969da"
                 strokeWidth={2.5}
                 dot={false}
-                isAnimationActive={false}
+                {...chartAnim}
                 name="actual"
               />
-              <Scatter dataKey="spike" fill="#cf222e" isAnimationActive={false} name="spike" />
+              <Scatter dataKey="spike" fill="#cf222e" {...chartAnim} name="spike" />
             </ComposedChart>
           </ResponsiveContainer>
         </div>

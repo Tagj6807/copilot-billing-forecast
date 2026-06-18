@@ -28,6 +28,7 @@ import {
   ChevronUpIcon,
 } from "@primer/octicons-react";
 import { useReport } from "@/components/report-provider";
+import { usePrefersReducedMotion } from "@/components/use-prefers-reduced-motion";
 import { ExportMenu } from "@/components/export-menu";
 import { SortableTh, type SortDir } from "@/components/sortable-th";
 import { aggregateByModel, type ModelSummary, type DailyPoint } from "@/lib/report";
@@ -80,6 +81,7 @@ type SortKey = "model" | "totalQuantity" | "share" | "users";
 
 export function ModelBreakdown() {
   const { report } = useReport();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const chartRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("totalQuantity");
@@ -289,6 +291,12 @@ export function ModelBreakdown() {
     return PALETTE[idx % (PALETTE.length - 1)];
   };
 
+  const chartAnim = {
+    isAnimationActive: !prefersReducedMotion,
+    animationDuration: 600,
+    animationEasing: "ease-out" as const,
+  };
+
   return (
     <div className={styles.stack}>
       {/* Summary stats */}
@@ -401,7 +409,7 @@ export function ModelBreakdown() {
                   stroke={colorFor(k)}
                   fill={colorFor(k)}
                   fillOpacity={0.55}
-                  isAnimationActive={false}
+                  {...chartAnim}
                 />
               ))}
             </ComposedChart>

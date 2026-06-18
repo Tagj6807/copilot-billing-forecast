@@ -105,7 +105,9 @@ function Shell() {
             {!report ? (
               <GlobalUploadPrompt />
             ) : ActiveView ? (
-              <ActiveView />
+              <div key={activeId} className={styles.toolView}>
+                <ActiveView />
+              </div>
             ) : (
               <Text>Unknown tool.</Text>
             )}

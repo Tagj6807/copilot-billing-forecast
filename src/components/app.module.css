@@ -111,6 +111,44 @@
   background-color: var(--bgColor-inset, #f6f8fa);
 }
 
+/* Tool switch: fade and ease the new view up into place. Keyed on the active
+   tool id in app-shell so it remounts and replays on every change. */
+.toolView {
+  animation: toolFadeIn 0.22s ease;
+}
+
+@keyframes toolFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .toolView {
+    animation: none;
+  }
+
+  .toolItem,
+  .toolIcon {
+    transition: none;
+  }
+
+  .toolItem:hover:not(:disabled),
+  .toolItemActive .toolIcon {
+    transform: none;
+  }
+
+  .toolItemActive::before {
+    animation: none;
+  }
+}
+
 .disclaimer {
   max-width: 1000px;
   margin: 32px auto 0;
@@ -917,11 +955,13 @@
   font: inherit;
   color: var(--fgColor-default, #1f2328);
   cursor: pointer;
-  transition: background-color 0.12s ease, border-color 0.12s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    transform 0.15s ease;
 }
 
 .toolItem:hover:not(:disabled) {
   background-color: var(--bgColor-muted, #f6f8fa);
+  transform: translateX(2px);
 }
 
 .toolItem:disabled {
@@ -944,6 +984,19 @@
   width: 3px;
   border-radius: 3px;
   background-color: var(--group-color, var(--fgColor-accent, #0969da));
+  transform-origin: center;
+  animation: toolIndicatorIn 0.2s ease;
+}
+
+@keyframes toolIndicatorIn {
+  from {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
 }
 
 .toolIcon {
@@ -957,12 +1010,15 @@
   background-color: var(--bgColor-default, #ffffff);
   border: 1px solid var(--borderColor-muted, #d8dee4);
   color: var(--group-color, var(--fgColor-muted, #59636e));
+  transition: background-color 0.18s ease, border-color 0.18s ease,
+    color 0.18s ease, transform 0.18s ease;
 }
 
 .toolItemActive .toolIcon {
   background-color: var(--group-color, var(--fgColor-accent, #0969da));
   border-color: var(--group-color, var(--fgColor-accent, #0969da));
   color: var(--fgColor-onEmphasis, #ffffff);
+  transform: scale(1.08);
 }
 
 .toolText {
