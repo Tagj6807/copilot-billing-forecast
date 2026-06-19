@@ -275,6 +275,14 @@ export function UsageForecast() {
   const adjustedRate = scenarioRate ?? baselineRate;
   const projectionLabel = isScenario ? "Scenario" : "Forecast";
 
+  // Keep the entitlement cap line in view: extend the Y axis to cover it plus the
+  // tallest plotted value, with a little headroom so its label isn't clipped.
+  const dataMax = cumulativeData.reduce((max, d) => {
+    const hi = Array.isArray(d.band) ? d.band[1] : 0;
+    return Math.max(max, d.actual ?? 0, d.forecast ?? 0, hi);
+  }, 0);
+  const yMax = Math.ceil(Math.max(dataMax, entitlement) * 1.05);
+
   const overageAic = entitlement > 0 ? Math.max(0, projectedEnd - entitlement) : 0;
   const overageUsd = overageAic * USD_PER_AIC;
 
@@ -543,6 +551,8 @@ export function UsageForecast() {
               <YAxis
                 tick={{ fontSize: 11, fill: "var(--fgColor-muted, #59636e)" }}
                 width={64}
+                domain={[0, yMax]}
+                allowDataOverflow
                 tickFormatter={(v: number) => compactAic(v)}
               />
               <Tooltip content={<CapTooltip entitlement={entitlement} selection={selection} />} />
